@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.1'
 	id 'io.spring.dependency-management' version '1.1.5'
+	id 'com.diffplug.spotless' version '6.11.0'
 }
 
 group = 'com.delivery'
@@ -37,3 +38,22 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// git hook 설정
+spotless {
+	java {
+		target("**/*.java")
+		googleJavaFormat().aosp()
+		importOrder()
+		removeUnusedImports()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+}
+
+tasks.register('updateGitHooks', Copy) {
+	from './scripts/pre-commit'
+	into './.git/hooks'
+	fileMode 0775
+}
+compileJava.dependsOn updateGitHooks
