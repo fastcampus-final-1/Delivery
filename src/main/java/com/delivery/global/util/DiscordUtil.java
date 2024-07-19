@@ -20,7 +20,7 @@ public class DiscordUtil {
     private final RestTemplate restTemplate = new RestTemplate();
 
     /**
-     * @param content - 내용을 입력할시 Discord 채널에 메세지가 전달이 된다.
+     * @param content 내용
      * @Auther Domae-back-end
      */
     public void sendMessage(String content) {

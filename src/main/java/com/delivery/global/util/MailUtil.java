@@ -21,9 +21,9 @@ public class MailUtil {
     private String pw;
 
     /**
-     * @param email   - 이메일 주소
-     * @param title   - 제목
-     * @param content - 내용
+     * @param email   이메일 주소
+     * @param title   제목
+     * @param content 내용
      * @Auther Domae-back-end
      */
     @Async("emailPoolTask")
