@@ -54,6 +54,11 @@ spotless {
 	}
 }
 
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+	options.compilerArgs += '-parameters'
+}
+
 tasks.register('updateGitHooks', Copy) {
 	from('./scripts/pre-commit') {
 		rename 'pre-commit', 'pre-commit'
