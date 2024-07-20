@@ -1,0 +1,50 @@
+name: delivery CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: JDK17 여부 판단
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - uses: application 파일 적용
+      - run: touch ./src/main/resources/application.yaml
+      - run: echo ${{ secrets.APPLICATION }} > ./src/main/resources/application.yaml
+      - run: cat ./src/main/resources/application.yaml
+
+      - name: gradlew 권한 부여
+        run: chmod +x ./gradlew
+
+      - name: 빌드 작업
+        run: ./gradlew build -x test
+        shell: bash
+
+      - name: Docker 이미지 빌드 및 푸시
+        env:
+          CR_PAT: ${{ secrets.GIT_TOKEN }}
+          IMAGE_NAME: delivery
+          IMAGE_TAG: latest
+        run: |
+          echo $CR_PAT | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+          docker build -t ghcr.io/$GITHUB_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG .
+          docker push ghcr.io/$GITHUB_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
+
+      - name: 해당 서버 Docker 실행 스크립트 작동
+        uses: appleboy/ssh-action@master
+        with:
+          username: student
+          host: ${{ secrets.HOST }}
+          password: ${{ secrets.PASSWORD }}
+          port: 8080
+          script_stop: true
+          script: chmod +x /home/ubuntu/docker_script.sh && sh /home/ubuntu/docker_script.sh
